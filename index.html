@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The GSI Gap — Unframe Partner Architecture Memo</title>
+<meta name="description" content="A GTM gap memo on Unframe's partner architecture, prepared by Leo Thornton for the VP, Partnerships & Alliances role." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Hallmark · macrostructure: Long Document · theme: Coral (light / geometric-sans-serif-pair / warm-coral) · nav: N9 edge-aligned · footer: Ft5 statement · enrichment: none */
+
+:root{
+  /* paper band — warm light, coral catalog */
+  --color-paper: oklch(97.8% 0.008 55);
+  --color-paper-2: oklch(94.5% 0.014 50);
+  --color-paper-3: oklch(90% 0.018 48);
+  --color-ink: oklch(22% 0.02 50);
+  --color-ink-soft: oklch(38% 0.02 50);
+  --color-ink-faint: oklch(54% 0.016 50);
+  --color-rule: oklch(85% 0.02 50);
+
+  /* one warm coral signal accent */
+  --color-accent: oklch(62% 0.19 32);
+  --color-accent-ink: oklch(98% 0.01 32);
+  --color-accent-soft: oklch(93% 0.05 32);
+
+  /* status */
+  --color-amber: oklch(70% 0.16 70);
+  --color-amber-soft: oklch(95% 0.04 70);
+  --color-focus: oklch(58% 0.19 32);
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.25rem;
+  --space-xl: 3.5rem;
+  --space-2xl: 5.5rem;
+  --space-3xl: 8rem;
+
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.5rem;
+  --text-display: clamp(2.5rem, 5vw + 1rem, 4.25rem);
+  --text-display-s: clamp(2rem, 3.5vw + 1rem, 3rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --measure: 68ch;
+}
+
+*{box-sizing:border-box;}
+html{overflow-x:clip;}
+body{
+  margin:0;
+  overflow-x:clip;
+  background:var(--color-paper);
+  color:var(--color-ink);
+  font-family:var(--font-body);
+  font-size:var(--text-base);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-style:normal;
+  line-height:1.08;
+  letter-spacing:-0.01em;
+  color:var(--color-ink);
+  margin:0;
+  overflow-wrap:anywhere;
+  min-width:0;
+}
+p{margin:0 0 var(--space-sm);color:var(--color-ink-soft);}
+a{color:var(--color-accent);text-decoration-thickness:1.5px;text-underline-offset:3px;}
+a:focus-visible,button:focus-visible,summary:focus-visible{
+  outline:2px solid var(--color-focus);
+  outline-offset:3px;
+  transition:none;
+}
+::selection{background:var(--color-accent-soft);}
+.container{max-width:76rem;margin-inline:auto;padding-inline:var(--space-md);}
+.prose{max-width:var(--measure);}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:150ms !important;scroll-behavior:auto !important;}
+}
+
+/* reveal-on-scroll: opacity + small rise, transform/opacity only */
+.reveal{opacity:0;transform:translateY(10px);transition:opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);}
+.reveal.is-in{opacity:1;transform:translateY(0);}
+
+/* ---------- NAV — N9 edge-aligned ---------- */
+.nav{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in oklch, var(--color-paper) 88%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--color-rule);
+}
+.nav-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-block:var(--space-sm);
+  gap:var(--space-md);
+}
+.nav-mark{
+  font-family:var(--font-display);font-weight:600;font-size:var(--text-lg);
+  white-space:nowrap;
+}
+.nav-meta{
+  font-family:var(--font-mono);font-size:var(--text-sm);color:var(--color-ink-faint);
+  text-transform:uppercase;letter-spacing:0.06em;
+  text-align:right;
+}
+
+/* ---------- HERO ---------- */
+.hero{padding-block:var(--space-2xl) var(--space-xl);border-bottom:1px solid var(--color-rule);}
+.hero-kicker{
+  font-family:var(--font-mono);font-size:var(--text-sm);letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--color-accent);margin-bottom:var(--space-md);
+  display:block;
+}
+.hero h1{font-size:var(--text-display);max-width:22ch;}
+.hero-sub{
+  margin-top:var(--space-lg);max-width:var(--measure);
+  font-size:var(--text-lg);color:var(--color-ink-soft);
+}
+.hero-sub strong{color:var(--color-ink);font-weight:600;}
+
+/* ---------- STAT BLOCK ---------- */
+.stat-block{
+  padding-block:var(--space-xl);
+  border-bottom:1px solid var(--color-rule);
+}
+.stat-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:var(--space-md);
+}
+.stat{
+  padding:var(--space-md);
+  border:1px solid var(--color-rule);
+  border-radius:var(--radius-md);
+  background:var(--color-paper-2);
+}
+.stat-num{
+  font-family:var(--font-display);font-weight:600;font-size:var(--text-2xl);
+  color:var(--color-ink);line-height:1;
+}
+.stat-num.is-open{color:var(--color-ink-faint);font-size:var(--text-lg);font-family:var(--font-mono);font-weight:500;}
+.stat-label{
+  margin-top:var(--space-2xs);font-size:var(--text-sm);color:var(--color-ink-faint);
+}
+
+/* ---------- SECTION HEADS ---------- */
+.section{padding-block:var(--space-2xl);border-bottom:1px solid var(--color-rule);}
+.section-head{margin-bottom:var(--space-xl);}
+.section-head h2{font-size:var(--text-2xl);max-width:20ch;}
+.section-head p{margin-top:var(--space-sm);max-width:var(--measure);}
+
+/* ---------- PLAY CARDS ---------- */
+.plays{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-md);}
+.play{
+  border:1px solid var(--color-rule);
+  border-radius:var(--radius-md);
+  padding:var(--space-md);
+  display:flex;flex-direction:column;gap:var(--space-sm);
+  background:var(--color-paper);
+}
+.play-num{font-family:var(--font-mono);font-size:var(--text-sm);color:var(--color-accent);}
+.play h3{font-size:var(--text-lg);}
+.play .diag,.play .motion{font-size:var(--text-sm);color:var(--color-ink-soft);}
+.play .diag strong,.play .motion strong{color:var(--color-ink);font-weight:600;}
+.play .targets{
+  font-family:var(--font-mono);font-size:var(--text-sm);color:var(--color-ink-faint);
+}
+.proof{
+  margin-top:auto;
+  border-left:3px solid var(--color-amber);
+  background:var(--color-amber-soft);
+  padding:var(--space-xs) var(--space-sm);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  font-size:var(--text-sm);
+  color:var(--color-ink);
+}
+.play.is-open .proof{border-left-color:var(--color-ink-faint);background:var(--color-paper-3);}
+
+/* ---------- ROADMAP ---------- */
+.roadmap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-md);}
+.phase{border-top:3px solid var(--color-accent);padding-top:var(--space-sm);}
+.phase-time{font-family:var(--font-mono);font-size:var(--text-sm);color:var(--color-ink-faint);text-transform:uppercase;letter-spacing:0.04em;}
+.phase h3{font-size:var(--text-lg);margin-top:var(--space-3xs);}
+.phase ul{margin:var(--space-sm) 0 0;padding-left:1.1em;color:var(--color-ink-soft);font-size:var(--text-sm);}
+.phase li{margin-bottom:var(--space-2xs);}
+.phase-deliverable{
+  margin-top:var(--space-sm);font-size:var(--text-sm);
+  padding:var(--space-2xs) var(--space-xs);
+  background:var(--color-paper-2);border-radius:var(--radius-sm);
+  color:var(--color-ink);
+}
+
+/* ---------- SIGNAL TABLE ---------- */
+.table-wrap{overflow-x:auto;border:1px solid var(--color-rule);border-radius:var(--radius-md);}
+table{width:100%;border-collapse:collapse;font-size:var(--text-sm);min-width:640px;}
+th,td{text-align:left;padding:var(--space-sm);border-bottom:1px solid var(--color-rule);vertical-align:top;}
+th{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.04em;font-size:0.75rem;color:var(--color-ink-faint);background:var(--color-paper-2);}
+tr:last-child td{border-bottom:none;}
+td:first-child{font-weight:600;color:var(--color-ink);white-space:nowrap;}
+
+/* ---------- OPEN QUESTION CALLOUT ---------- */
+.callout{
+  border:1px solid var(--color-rule);
+  border-left:3px solid var(--color-ink-faint);
+  background:var(--color-paper-2);
+  padding:var(--space-md);
+  border-radius:0 var(--radius-md) var(--radius-md) 0;
+  font-size:var(--text-sm);
+  color:var(--color-ink-soft);
+}
+.callout strong{color:var(--color-ink);}
+
+/* ---------- FOOTER — Ft5 statement ---------- */
+.footer{padding-block:var(--space-xl);}
+.footer-statement{
+  font-family:var(--font-display);font-size:var(--text-xl);max-width:26ch;
+  margin-bottom:var(--space-lg);
+}
+.footer-row{
+  display:flex;flex-wrap:wrap;gap:var(--space-md);justify-content:space-between;
+  align-items:baseline;border-top:1px solid var(--color-rule);padding-top:var(--space-md);
+  font-size:var(--text-sm);color:var(--color-ink-faint);
+}
+.footer-row a{color:var(--color-ink-soft);}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 860px){
+  .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .plays{grid-template-columns:1fr;}
+  .roadmap{grid-template-columns:1fr;}
+}
+@media (max-width: 480px){
+  .stat-grid{grid-template-columns:1fr;}
+  .hero h1{max-width:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-row">
+    <span class="nav-mark">Leo Thornton</span>
+    <span class="nav-meta">VP, Partnerships &amp; Alliances — For Unframe AI</span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <span class="hero-kicker">Partner architecture memo · 2026-07-14</span>
+    <h1 class="reveal is-in">Zero named GSI relationships. No documented Rules of Engagement between the new RVP layer and Unframe Unlimited.</h1>
+    <p class="hero-sub reveal is-in">Unframe crossed <strong>$100M TCV</strong> and <strong>400% NRR</strong> in twelve months and launched a named partner program in January. An independent analyst has already named the missing GSI layer as the structural constraint on growth — unprompted. Here is the gap map, three plays, and a 90-day plan.</p>
+  </div>
+</header>
+
+<section class="stat-block">
+  <div class="container stat-grid">
+    <div class="stat reveal is-in">
+      <div class="stat-num">0/5</div>
+      <div class="stat-label">GSI channel maturity — zero named relationships</div>
+    </div>
+    <div class="stat reveal is-in">
+      <div class="stat-num">6 mo</div>
+      <div class="stat-label">Age of Unframe Unlimited, the first named channel program</div>
+    </div>
+    <div class="stat reveal is-in">
+      <div class="stat-num">$100M</div>
+      <div class="stat-label">TCV in year one · 400% NRR</div>
+    </div>
+    <div class="stat reveal is-in">
+      <div class="stat-num is-open">unconfirmed</div>
+      <div class="stat-label">Hyperscaler co-sell status — not asserted either way</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Three plays, ranked by verified confidence</h2>
+      <p>The GSI and Rules-of-Engagement gaps are independently dated and confirmed. The hyperscaler play is framed as a question — direct Marketplace searches during this research pass could not confirm a listing either way, and this memo does not assert one.</p>
+    </div>
+    <div class="plays">
+
+      <article class="play reveal is-in">
+        <span class="play-num">Play 01</span>
+        <h3>Customer-to-Channel Conversion + GSI Blueprint Packaging</h3>
+        <p class="diag"><strong>Diagnosis:</strong> Cushman &amp; Wakefield and Avison Young aren't just case studies — both are global real estate services firms with advisory client bases of their own. No public evidence either has been asked to sell Unframe forward. Separately: zero named GSI relationships anywhere, independently flagged as the top structural risk to growth.</p>
+        <p class="motion"><strong>Motion:</strong> Two tracks, different speeds. Near-term: convert Cushman &amp; Wakefield / Avison Young from customers into resellers — faster than cold-starting a GSI. Medium-term: package 2–3 proven Blueprints as a white-label methodology GSIs can certify consultants on.</p>
+        <p class="targets">Targets: Cushman &amp; Wakefield · Avison Young · Accenture · Deloitte · KPMG</p>
+        <p class="proof">$30M+ pipeline built at DoiT from zero; AWS's 900+-participant GSI enablement framework, 37% faster partner time-to-market.</p>
+      </article>
+
+      <article class="play reveal is-in">
+        <span class="play-num">Play 02</span>
+        <h3>Channel Conflict Prevention: RVP / Partner ROE</h3>
+        <p class="diag"><strong>Diagnosis:</strong> The new RVP layer (East US, West US, EMEA) and Unframe Unlimited went live in the same window with no documented Rules of Engagement found anywhere public.</p>
+        <p class="motion"><strong>Motion:</strong> A comp-neutral deal-registration system, live before the first real conflict — not after.</p>
+        <p class="targets">Targets: Climb Channel Solutions · East/West/EMEA RVPs</p>
+        <p class="proof">Shipped deal registration in week one at DoiT — $30M+ partner-sourced pipeline in 6 months, 20× a $1.5M quota.</p>
+      </article>
+
+      <article class="play reveal is-in is-open">
+        <span class="play-num">Play 03</span>
+        <h3>The Pricing/Procurement Tension Behind the Open Question</h3>
+        <p class="diag"><strong>Diagnosis:</strong> No AWS or GCP Marketplace listing could be independently confirmed — unconfirmed, not asserted either way. But "no upfront cost," Unframe's own pricing story, is structurally the <em>opposite</em> of how enterprise cloud-commit drawdown works. Unframe's proven buyers (an F500 bank, real estate services firms) are exactly the profile most likely to prefer routing spend through committed cloud credits.</p>
+        <p class="motion"><strong>Motion:</strong> Confirm the real status in week one. If no listing exists, it moves from nice-to-have to critical-path before the tension becomes a closing blocker at the next contract size up.</p>
+        <p class="targets">Targets: AWS ISV Accelerate · GCP QSV · CPPO private-offer structure</p>
+        <p class="proof">106% of a $60M AWS consumption target; built DoiT's GCP SWAT partner kit across 5 verticals.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>90-day revenue architecture</h2>
+      <p>Each phase references the gaps above directly — no generic "build relationships" filler.</p>
+    </div>
+    <div class="roadmap">
+      <div class="phase reveal is-in">
+        <span class="phase-time">Days 1–30 · Land</span>
+        <h3>Audit &amp; Align</h3>
+        <ul>
+          <li>Confirm the real Marketplace/co-sell status with product and engineering</li>
+          <li>Map Climb's live pipeline against Unlimited's design intent</li>
+          <li>Surface RVP channel-conflict friction before it hardens</li>
+          <li>Open a first GSI practice-lead conversation</li>
+        </ul>
+        <p class="phase-deliverable">Deliverable: validated Gap Map shared with Jacquelyn Goldberg</p>
+      </div>
+      <div class="phase reveal is-in">
+        <span class="phase-time">Days 31–60 · Expand</span>
+        <h3>Activate the Rails</h3>
+        <ul>
+          <li>Stand up comp-neutral deal registration for the RVP/Climb boundary</li>
+          <li>Pressure-test the Blueprint-packaging framework with the GSI contact</li>
+          <li>Submit Marketplace listing or co-sell enrollment if confirmed needed</li>
+        </ul>
+        <p class="phase-deliverable">Deliverable: deal registration live · one GSI framework in negotiation</p>
+      </div>
+      <div class="phase reveal is-in">
+        <span class="phase-time">Days 61–90 · Scale</span>
+        <h3>Build the Machine</h3>
+        <ul>
+          <li>Convert the GSI conversation into a named pilot</li>
+          <li>Report first partner-sourced pipeline number under the new ROE</li>
+          <li>Scope the co-sell roadmap with dates if the hyperscaler build was needed</li>
+        </ul>
+        <p class="phase-deliverable">Deliverable: one named GSI pilot · first clean pipeline figure</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Why this background, for this moment</h2>
+      <p class="prose">One open item this memo does not resolve: Unframe named a Global VP of Partnerships in December. Where this role's scope sits against that is a direct question, not an assumption made here.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Signal</th><th>Track record</th><th>Unframe application</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Zero-to-one channel build</td><td>DoiT: $0 to $30M+ partner-sourced pipeline in 6 months, deal registration in week one</td><td>Closes the RVP/Climb ROE gap before it becomes a trust problem</td></tr>
+          <tr><td>GSI enablement at scale</td><td>AWS: framework adopted by 900+ GSI participants, 37% faster time-to-market</td><td>Builds the Blueprint-packaging motion Unframe has none of today</td></tr>
+          <tr><td>Multi-vertical GTM design</td><td>DoiT GCP SWAT: Partner Engagement Kit across 5 verticals</td><td>Matches Unframe's proven verticals — FSI, real estate, healthcare</td></tr>
+          <tr><td>Hyperscaler field experience</td><td>4 years inside AWS; 106% of a $60M consumption target</td><td>Resolves the open hyperscaler question fast, from both sides of the table</td></tr>
+          <tr><td>Executive-level GTM communication</td><td>Hosted a C-suite roundtable spanning FSI, gaming, technology</td><td>Operates at GSI-practice-lead and hyperscaler-field altitude from day one</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p class="footer-statement">Better for this to be wrong than for it not to exist.</p>
+    <div class="footer-row">
+      <span>Leo Thornton · Partnerships &amp; Alliances</span>
+      <a href="mailto:leondrus.thornton@gmail.com">leondrus.thornton@gmail.com</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('is-in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  els.forEach(function(el){ io.observe(el); });
+}
+</script>
+
+</body>
+</html>
